@@ -1,0 +1,51 @@
+
+phase: 'train'
+# phase: 'test'
+load_yaml: True
+gpu: '3'
+
+# pretraining setting
+continue_train: False
+ckpt_name: 'model_best.pth.tar'
+# continue_train: True
+# ckpt_name: 'epoch009.pth.tar'
+
+# continue_train: True
+# ckpt_name: 'pretrained_model_best.pth.tar'
+
+######################## ADNI ########################
+data_type: 'pair'
+# data_type: 'single'
+# data_type: 'triplet'
+dataset_name: 'ADNI'
+# data_path: '../data/ADNI/'
+data_path: '../../longitudinal-social-pooling/data/ADNI/'
+img_file_name: 'ADNI_longitudinal_img_aug.h5'
+# img_file_name: 'ADNI_longitudinal_img.h5'
+noimg_file_name: 'ADNI_longitudinal_noimg.h5'
+subj_list_postfix: 'NC_AD_pMCI_sMCI'
+# subj_list_postfix: 'NC_AD'
+# subj_list_postfix: 'pMCI_sMCI'
+
+epochs: 50
+batch_size: 64
+num_fold: 5
+fold: 0
+train_all: True
+shuffle: True
+lr: 0.0005
+aug: False
+
+latent_size: 1024
+
+model_name: 'AE'
+lambda_recon: 1.
+lambda_dir: 0.
+
+# model_name: 'LSSL'
+# # model_name: 'LNE'
+# lambda_recon: 1.
+# lambda_dir: 1.
+
+# train all
+ckpt_timelabel: '2023_3_2_11_29'             # LSSL, gpu 3, 667524

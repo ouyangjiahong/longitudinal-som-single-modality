@@ -1,0 +1,53 @@
+
+phase: 'train'
+# phase: 'test'
+load_yaml: True
+gpu: '1'
+
+# pretraining setting
+# continue_train: False
+# ckpt_name: 'model_best.pth.tar'
+
+continue_train: True
+ckpt_name: 'pretrained_model_best.pth.tar'
+
+######################## ADNI ########################
+data_type: 'single'
+dataset_name: 'ADNI'
+# data_path: '../data/ADNI/'
+data_path: '../../longitudinal-social-pooling/data/ADNI/'
+img_file_name: 'ADNI_longitudinal_img_aug.h5'
+# img_file_name: 'ADNI_longitudinal_img.h5'
+noimg_file_name: 'ADNI_longitudinal_noimg_full.h5'
+
+# subj_list_postfix: 'NC_AD'
+# task: 'NC_AD_classification'
+
+# subj_list_postfix: 'pMCI_sMCI'
+# task: 'pMCI_sMCI_classification'
+
+subj_list_postfix: 'NC_AD_pMCI_sMCI'
+# task: 'adas_regression'
+task: 'age_regression'
+
+
+epochs: 80
+batch_size: 128
+num_fold: 5
+fold: 0
+shuffle: True
+lr: 0.0005
+# aug: False
+aug: True
+
+latent_size: 1024
+use_feature: ['z']
+froze_encoder: True
+lambda_cls: 1.0
+
+model_name: 'CLS'
+is_som: False
+embedding_size: [4, 8]
+
+# fix BN bug
+ckpt_timelabel: 'SOM_age'                   # 2023_3_1_23_11, NC_AD_classification, z, frozen

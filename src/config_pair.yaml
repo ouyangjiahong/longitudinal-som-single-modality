@@ -1,0 +1,60 @@
+
+phase: 'train'
+# phase: 'test'
+load_yaml: True
+gpu: '0'
+
+# pretraining setting
+continue_train: False
+ckpt_name: 'model_best.pth.tar'
+# continue_train: True
+# ckpt_name: 'epoch000.pth.tar'
+
+# continue_train: True
+# ckpt_name: 'pretrained_model_best.pth.tar'
+
+######################## ADNI ########################
+data_type: 'pair'
+dataset_name: 'ADNI'
+# data_path: '../data/ADNI/'
+data_path: '../../longitudinal-social-pooling/data/ADNI/'
+img_file_name: 'ADNI_longitudinal_img_aug.h5'
+noimg_file_name: 'ADNI_longitudinal_noimg.h5'
+subj_list_postfix: 'NC_AD_pMCI_sMCI'
+
+epochs: 50
+batch_size: 64
+num_fold: 5
+fold: 0
+train_all: True
+shuffle: True
+lr: 0.0005
+aug: False
+
+latent_size: 1024
+embedding_size: [4, 8]
+init_emb: 'pretrained-kmeans-switch'
+
+model_name: 'SOMPairVisit'
+lambda_recon: 1.
+lambda_recon_zq: 1.
+lambda_commit: 0.5
+commit_ratio: 1.0
+lambda_som: 1.
+
+# LSSL for dir_reg
+# lambda_dir: 0.5
+# dir_reg: 'LSSL'
+emb_dir_ratio: 1.
+
+# LNE for dir_reg
+lambda_dir: 0.1
+dir_reg: 'LNE'
+is_grid_ema: True
+grid_ema_rate: 0.99
+
+warmup_epochs: 10
+Tmax: 1.
+Tmin: 0.1
+
+ckpt_timelabel: '2023_5_1_18_5'             # debug
