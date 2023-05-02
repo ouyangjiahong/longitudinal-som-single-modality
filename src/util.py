@@ -52,23 +52,6 @@ class CrossSectionalDataset(Dataset):
             if len(img.shape) != 3:
                 img = np.array(self.data_img[subj_id][case_id][0])
 
-        # if self.aug:
-        #     rand_idx = np.random.randint(0, 10)
-        #     img = np.array(self.data_img[subj_id]['img'][str(case_order)][rand_idx])
-        # else:
-        #     img = np.array(self.data_img[subj_id]['img'][str(case_order)])
-        #     if len(img.shape) != 3:
-        #         img = np.array(self.data_img['img'][str(case_order)][0])
-        # img = np.nan_to_num(img, nan=0.0, copy=False)
-        # img[np.isinf(img)] = 0
-        #
-        # seg = np.array(self.data_img[subj_id]['seg'][str(case_order)])
-        # seg = np.nan_to_num(seg, nan=0.0, copy=False)
-        # seg[np.isinf(seg)] = 0
-        #
-        # feat = np.array(self.data_img[subj_id]['feat'][str(case_order)])
-
-        # img = np.array(self.data_img[subj_id][case_id])
         if self.is_label_tp:
             label = np.array(self.data_noimg[subj_id]['label_all'][case_order])
         else:
@@ -77,11 +60,7 @@ class CrossSectionalDataset(Dataset):
 
         adas = np.array(self.data_noimg[subj_id]['adas'][case_order])
         mmse = np.array(self.data_noimg[subj_id]['mmse'][case_order])
-        # if self.dataset_name == 'LAB':
-        #     age = (age - 47.3) / 17.6
-        # if self.dataset_name == 'NCANDA':
-        #     age = (age - 19.5) / 3.4
-        # return {'img': img, 'label': label, 'age': age, 'subj_id': subj_id, 'case_order': case_order, 'seg': seg, 'feat': feat}
+
         return {'img': img, 'label': label, 'age': age, 'subj_id': subj_id, 'case_order': case_order, 'adas': adas, 'mmse': mmse}
 
 class LongitudinalPairDataset(Dataset):
@@ -385,4 +364,3 @@ def inverse_normalize_label(config, label):
         else:
             raise ValueError('Not support!')
     return label
-
