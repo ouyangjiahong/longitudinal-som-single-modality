@@ -177,7 +177,6 @@ class SOM(nn.Module):
         self.latent_size = config['latent_size']
         self.embedding_size = config['embedding_size']
         self.dataset_name = config['dataset_name']
-        init_emb = config['init_emb']
 
         self.encoder = Encoder(in_num_ch=1, inter_num_ch=16, num_conv=2)
         self.decoder = Decoder(out_num_ch=1, inter_num_ch=16, num_conv=2, shortcut=False)
@@ -234,7 +233,7 @@ class SOM(nn.Module):
         return z_dist
 
     # for each z_e, find the nearest embedding z_q
-    def compute_zq(self, z_e, global_iter=-1, iter_max=-1):
+    def compute_zq(self, z_e):
         z_dist = self.compute_zq_distance(z_e)
         k = torch.argmin(z_dist.view(z_e.shape[0], -1), dim=-1)
         k_1 = k // self.embedding_size[1]
@@ -242,22 +241,6 @@ class SOM(nn.Module):
         k_stacked = torch.stack([k_1, k_2], dim=1)
         z_q = self._gather_nd(self.embeddings, k_stacked)
         return z_q, k
-
-    # find the neighbours of z_q
-    def compute_zq_neighbours(self, z_q, k):
-        k_1 = k // self.embedding_size[1]
-        k_2 = k % self.embedding_size[1]
-        k1_down = torch.where(k_1 < self.embedding_size[0] - 1, k_1 + 1, k_1)
-        k1_up = torch.where(k_1 > 0, k_1 - 1, k_1)
-        k2_right = torch.where(k_2 < self.embedding_size[1] - 1, k_2 + 1, k_2)
-        k2_left = torch.where(k_2 > 0, k_2 - 1, k_2)
-        z_q_up = self._gather_nd(self.embeddings, torch.stack([k1_up, k_2], dim=1))
-        z_q_down = self._gather_nd(self.embeddings, torch.stack([k1_down, k_2], dim=1))
-        z_q_left = self._gather_nd(self.embeddings, torch.stack([k_1, k2_left], dim=1))
-        z_q_right = self._gather_nd(self.embeddings, torch.stack([k_1, k2_right], dim=1))
-        z_q_neighbours = torch.stack([z_q, z_q_up, z_q_down, z_q_left, z_q_right], dim=1)  # check whether gradient get back if no z_q
-        # z_q_neighbours = torch.stack([z_q_up, z_q_down, z_q_left, z_q_right], dim=1)  # check whether gradient get back if no z_q
-        return z_q_neighbours
 
     # compute manhattan distance for each embedding to given nearest embedding index k
     def compute_manhattan_distance(self, k):
@@ -280,7 +263,7 @@ class SOM(nn.Module):
     # reconstruction loss
     def compute_recon_loss(self, x, recon):
         return torch.mean((x - recon) ** 2)
-    
+
     # standard commitment loss, make sure z_q close to z_e (fix z_e)
     def compute_commit_loss(self, z_e, z_q):
         return torch.mean((z_e.detach() - z_q) ** 2) + self.config['commit_ratio'] * torch.mean((z_e - z_q.detach()) ** 2)
@@ -295,7 +278,7 @@ class SOM(nn.Module):
         return sim_flatten
 
     # som loss based on grid distance to zq, from XADLiME paper
-    def compute_som_loss(self, z_e, k, iter=-1, iter_max=-1, Tmax=1., Tmin=0.1):
+    def compute_som_loss(self, z_e, k, iter=-1, iter_max=-1):
         Tmin = self.config['Tmin']
         Tmax = self.config['Tmax']
         dis_ze_emb = self.compute_zq_distance(z_e.detach())
@@ -325,9 +308,9 @@ class SOM(nn.Module):
         recon_emb_list = torch.cat(recon_emb_list, 0)
         return recon_emb_list
 
-    def forward(self, x, global_iter=-1, iter_max=-1):
+    def forward(self, x):
         z_e, feat_list = self.encoder(x)
-        z_q, k = self.compute_zq(z_e, global_iter, iter_max)
+        z_q, k = self.compute_zq(z_e)
         sim = self.compute_similarity(z_e, sim_type='softmax')
         recon_ze = self.decoder(z_e, feat_list)
         recon_zq = self.decoder(z_q, feat_list)
@@ -343,7 +326,6 @@ class SOMPairVisit(SOM):
         self.latent_size = config['latent_size']
         self.embedding_size = config['embedding_size']
         self.dataset_name = config['dataset_name']
-        init_emb = config['init_emb']
 
         self.encoder = Encoder(in_num_ch=1, inter_num_ch=16, num_conv=2)
         self.decoder = Decoder(out_num_ch=1, inter_num_ch=16, num_conv=2, shortcut=False)
@@ -382,7 +364,7 @@ class SOMPairVisit(SOM):
         if self.config['is_grid_ema'] == True:
             self.embeddings_dz_ema.data = torch.tensor(init, requires_grad=False).to(self.device)
             print('Finished grid ema initialization!')
-    
+
     def compute_lssl_direction_loss(self, z_e_diff):
         bs = z_e_diff.shape[0]
         delta_z = z_e_diff

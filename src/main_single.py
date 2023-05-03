@@ -129,7 +129,7 @@ def train():
             label = sample['label'].to(config['device'], dtype=torch.float)
 
             # run model
-            recons, zs = model(image, global_iter, iter_max)
+            recons, zs = model(image)
 
             recon_ze = recons[0]
             recon_zq = recons[1]
