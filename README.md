@@ -4,7 +4,7 @@ LSOR: Longitudinally-Consistent Self-Organized Representation Learning (MICCAI20
 Contact: Jiahong Ouyang, jiahongo@stanford.edu
 
 #### To run LSOR  (SOM **with** longitudinal consistency regularization)
-python main_single.py
+python main_pair.py
 
 #### To run the single visit SOM  (SOM **without** longitudinal consistency regularization)
-python main_pair.py
+python main_single.py
